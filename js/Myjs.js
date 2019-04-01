@@ -505,15 +505,10 @@ function mostFreqStr(arr) {
       which.push(ea);
     }
   });
-  /*
-  if (which.length > 1) {
-    which = `"${which.join(`" and "`)}" are most frequent`
-  } else {
-    which = `"${which}" is the most frequent`
-  }
-*/
+
   return which;
 }
+
 
 function updateSpeed(){
 	 
@@ -540,15 +535,58 @@ function updateSpeed(){
 	
 }
 
+var streetNames = L.geoJson(trips, {
+   style : tripsStyle,
+   onEachFeature: function (features, layer) {
+       layer.bindPopup('Shashi taxi id: <b>' + features.properties.taxiid +'</b>');
+   }  ,
+     filter: function (features, layer) {
+
+     for(var i=0; i<features.properties.streetnames.length; i++){
+       return_value = false;
+       if( features.properties.streetnames[i]== "Praca da Batalha") {
+           console.log("shashikant displaying - Praca da Batalha")
+           return_value = true;
+           break;
+       }
+
+   }
+   return return_value;
+ }
+
+});
+
+//document.getElementById("streetButton").addEventListener("click", showStreets);
+
+function showStreets() {
+
+        //Remove Markers if any
+         if(theMarker.length>0){
+           for(var i=0;i<theMarker.length;i++){
+              map.removeLayer(theMarker[i]);
+           }
+         }
+
+       //Remove if there is any other map layer
+       this.layer.eachLayer(function(layer){
+            map.removeLayer(layer);
+       });
+
+        //Add new geoJSON layer with street Names
+       streetNames.addTo(map);
+};
+
 map.on('click', function () {
 	if(theMarker.length>0){
 		for(var i=0;i<theMarker.length;i++){
 			 map.removeLayer(theMarker[i]);
 		}
-
 	}
- 
+
+
+ for(var i=0;i<markerlist.length;i++ ){
+   map.removeLayer(markerlist[i]);
+ }
 
  document.getElementById('chkYes').checked = false;
-
 });
