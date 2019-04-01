@@ -55,7 +55,7 @@
         <div class="container-fluid">
             <!-- Collect the nav links, forms, and other content for toggling -->
             <div class="navbar-header">
-                <a class="navbar-brand" href="#"><font size="4" color="white"><b>Information Visualization Project - Spring 2018</b></font></a>
+                <a class="navbar-brand" href="#"><font size="4" color="white"><b>Urban Trajectory Project Spring 2019 - Priyanka Taneja, Rashi Jain, Shashikant Jaiswal</b></font></a>
             </div>
             <!-- /.navbar-collapse -->
         </div>
@@ -63,6 +63,9 @@
     </nav>
 	 <div id="map"></div>
 	 <div id="rightside">
+	   <img id="lengend1" src="js/images/greenMarker.png"/> Start Point<br>
+	    <img id="lengend1" src="js/images/redMarker.png"/> End Point<br>
+
 		<label >
 			<input type="radio" id="chkYes" name="oneGroup" onclick="showMaxDuration()" />
 			 Top 5 Max Duration
@@ -75,13 +78,16 @@
 			<input type="radio" id="chkYes" name="oneGroup" onclick="showMostFrequent()" />
 			 Most  Frequent Pick Up and Drop Off
 		</label>
+
+    </div>
+
 	 </div>
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="js/bootstrap.min.js"></script>
 	<!-- Your js File -->
-	
+
   <script src = "js/trips.geojson"></script>
    <script src="js/AnimatedMarker.js"></script>
     <script src="js/Myjs.js"></script>

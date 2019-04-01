@@ -2,8 +2,8 @@ body,
 html {
 	height: 100%;
 	padding-top: 25px;
-	width: 100%; 
-	margin: 0; 
+	width: 100%;
+	margin: 0;
 }
 
 #map {
@@ -16,8 +16,13 @@ html {
 #rightside {
 	width: 20%;
 	height: 100%;
-	position: fixed; 
+	position: fixed;
 	background-color: snow;
 	left: 80%;
 	padding-left:2%
+}
+
+#lengend1,#lengend2{
+	width: 20px;
+	height: 20px;
 }

@@ -13,13 +13,13 @@ var taxi_id_map = new Map();
 var picon = L.icon({
     iconUrl: '\js\\images\\greenMarker.png',
     iconSize:     [40, 40], // size of the icon
-    
+
 	});
-	
+
 	var dicon = L.icon({
 		iconUrl: '\js\\images\\redMarker.png',
 		iconSize:     [40, 40], // size of the icon
-		
+
 	});
 for(i=0;i<trips.features.length;i++){
  taxi_id_map.set(trips.features[i].properties.taxiid,'#'+Math.floor(Math.random()*16777215).toString(16));
@@ -83,7 +83,7 @@ function onEachFeature(features, layer) {
 		for(var i=0;i<theMarker.length;i++){
 			 map.removeLayer(theMarker[i]);
 		}
-		
+
 	}
     for(i=0;i<trips.features.length;i++){
       if(features.properties.taxiid == trips.features[i].properties.taxiid){
@@ -148,7 +148,7 @@ var drawControl = new L.Control.Draw({
         rectangle: true,
         marker: false,
     }
-   
+
 });
 
 map.addControl(drawControl); // To add anything to map, add it to "drawControl"
@@ -178,17 +178,17 @@ var rt = cw(function(data,cb){
 });
 
 rt.data(cw.makeUrl("js/trips.json"));
-//*****************************************************************************************************************************************	
+//*****************************************************************************************************************************************
 //*****************************************************************************************************************************************
 // Drawing Shapes (polyline, polygon, circle, rectangle, marker) Event:
 // Select from draw box and start drawing on map.
-//*****************************************************************************************************************************************	
+//*****************************************************************************************************************************************
 
 map.on('draw:created', function (e) {
-	
+
 	var type = e.layerType,
 		layer = e.layer;
-	
+
 	if (type === 'rectangle') {
 		//console.log(layer.getLatLngs()); //Rectangle Corners points
 		var bounds=layer.getBounds();
@@ -196,12 +196,12 @@ map.on('draw:created', function (e) {
 		then(function(d){var result = d.map(function(a) {return a.properties;});
 		//console.log(result);		// Trip Info: avspeed, distance, duration, endtime, maxspeed, minspeed, starttime, streetnames, taxiid, tripid
 		map.fitBounds(layer.getBounds());
-		
+
 		DrawRS(result);
 		});
 	}
-	
-	drawnItems.addLayer(layer);			//Add your Selection to Map  
+
+	drawnItems.addLayer(layer);			//Add your Selection to Map
 });
 //*****************************************************************************************************************************************
 // DrawRS Function:
@@ -210,95 +210,95 @@ map.on('draw:created', function (e) {
 //*****************************************************************************************************************************************
 function DrawRS(trips) {
 	for (var j=0; j<trips.length; j++) {  // Check Number of Segments and go through all segments
-		var TPT = new Array();			  
-		TPT = TArr[trips[j].tripid].split(',');  		 // Find each segment in TArr Dictionary. 
+		var TPT = new Array();
+		TPT = TArr[trips[j].tripid].split(',');  		 // Find each segment in TArr Dictionary.
 		var polyline = new L.Polyline([]).addTo(drawnItems);
         polyline.setStyle({
             color: 'red',                      // polyline color
 			weight: 1,                         // polyline weight
 			opacity: 0.5,                      // polyline opacity
-			smoothFactor: 1.0  
+			smoothFactor: 1.0
         });
 		for(var y = 0; y < TPT.length-1; y=y+2){    // Parse latlng for each segment
 			polyline.addLatLng([parseFloat(TPT[y+1]), parseFloat(TPT[y])]);
 		}
-	}		
+	}
 }
 
 
 function showMaxDuration(){
-	
+
 
 	if(theMarker.length>0){
 		for(var i=0;i<theMarker.length;i++){
 			 map.removeLayer(theMarker[i]);
 		}
-		
+
 	}
 	showLayers();
 	var icon = L.icon({
     iconUrl: '\js\\images\\taxi.gif',
     iconSize:     [20, 20], // size of the icon
-    
+
 	});
 	var duration=[];
-	
-   
+
+
 	var len= trips.features.length;
 	for(var i=0;i<len;i++){
 		duration[i]= trips.features[i].properties.duration;
 	}
 	var topDurationValues = duration.sort((a,b) => b-a).slice(0,5);
-	
+
 	var latlongs=[];
-	
+
 	for(var i=0;i<len;i++){
 		if(topDurationValues.indexOf(trips.features[i].properties.duration) !=-1){
 			var sx= (trips.features[i].geometry.coordinates[0])[1];
 			var sy= (trips.features[i].geometry.coordinates[0])[0];
-			
+
 			var l= (trips.features[i].geometry.coordinates).length -1;
 			var ex= (trips.features[i].geometry.coordinates[l])[1];
 			var ey= (trips.features[i].geometry.coordinates[l])[0];
-			
-			
+
 			trips.features[i].properties.highlight =true;
-		
-			 var m=L.marker([sx,sy],{icon: picon}).bindPopup( 'Maximum Duration: <b>' + trips.features[i].properties.duration +'</b><br>Street Name: <b>' + trips.features[i].properties.streetnames[0] +'</b><br>Trip Id: <b>'+trips.features[i].properties.tripid+'</b>');
+
+			 var m=L.marker([sx,sy],{icon: picon}).bindPopup( 'Maximum Duration: <b>' + trips.features[i].properties.duration +'</b><br>Street Name: <b>' + trips.features[i].properties.streetnames[0] +'</b><br>Taxi Id: <b>'+trips.features[i].properties.taxiid+'</b><br>Trip Id: <b>'+trips.features[i].properties.tripid+'</b><br>Start Time: <b>'+
+			trips.features[i].properties.starttime+'</b>');
 			theMarker.push(m);
 			map.addLayer(m);
-			
-			 var m=L.marker([ex,ey],{icon: dicon}).bindPopup( 'Maximum Duration: <b>' + trips.features[i].properties.duration +'</b><br>Street Name: <b>' + trips.features[i].properties.streetnames[l] +'</b><br>Trip Id: <b>'+  trips.features[i].properties.tripid+'</b>');
-			
-			
+			latlongs.push(m.getLatLng());
+
+			 var m=L.marker([ex,ey],{icon: dicon}).bindPopup( 'Maximum Duration: <b>' + trips.features[i].properties.duration +'</b><br>Street Name: <b>' + trips.features[i].properties.streetnames[l]+'</b><br>Taxi Id: <b>'+trips.features[i].properties.taxiid +'</b><br>Trip Id: <b>'+  trips.features[i].properties.tripid+'</b><br>End Time: <b>'+
+			trips.features[i].properties.endtime+'</b>');
 			theMarker.push(m);
 			map.addLayer(m);
-			
-					var coord=[];							
+
+					var coord=[];
 					var points=[];
 					coord=trips.features[i].geometry.coordinates;
-					for(var k=0;k<coord.length;k++){					
-					points.push( new L.LatLng((coord[k])[1],(coord[k])[0]));					
+					for(var k=0;k<coord.length;k++){
+					points.push( new L.LatLng((coord[k])[1],(coord[k])[0]));
 					}
 					var line=L.polyline(points, { opacity:0 });
 					map.addLayer(line);
 					var animatedMarker = L.animatedMarker(line.getLatLngs(),{icon:icon});
 					map.addLayer(animatedMarker);
 					theMarker.push(animatedMarker);
-			
-			
-			
+
+
+
 			latlongs.push(m.getLatLng());
-			 
-		  
+
+
 		}
 	}
 	hideLayers();
 	var markerBounds = L.latLngBounds(latlongs);
 	map.fitBounds(markerBounds);
 }
-	
-	
+
+
 
 function getTripColor(taxiid){
 
@@ -319,21 +319,21 @@ function tripsStyle(features){
 
 
 function showAverageSpeed(){
-	
+
 	showLayers();
-	
+
 	if(theMarker.length>0){
 		for(var i=0;i<theMarker.length;i++){
 			 map.removeLayer(theMarker[i]);
 		}
-		
+
 	}
 	var icon = L.icon({
     iconUrl: '\js\\images\\taxii.gif',
-    iconSize:     [40, 40], // size of the icon
-    
+    iconSize:     [20, 20], // size of the icon
+
 	});
-	
+
 	var averageSpeed=[];
 	var len= trips.features.length;
 	for(var i=0;i<len;i++){
@@ -344,20 +344,49 @@ function showAverageSpeed(){
 
 	for(var i=0;i<len;i++){
 		if(topaverageSpeed.indexOf(trips.features[i].properties.avspeed) !=-1){
-			var x= (trips.features[i].geometry.coordinates[0])[1];
-			var y= (trips.features[i].geometry.coordinates[0])[0];
+
+
+			var sx= (trips.features[i].geometry.coordinates[0])[1];
+			var sy= (trips.features[i].geometry.coordinates[0])[0];
+
+			var l= (trips.features[i].geometry.coordinates).length -1;
+			var ex= (trips.features[i].geometry.coordinates[l])[1];
+			var ey= (trips.features[i].geometry.coordinates[l])[0];
+
 			trips.features[i].properties.highlight =true;
-			var m=L.marker([x,y],{icon: icon}).bindPopup( 'Maximum Average Speed: <b>' + trips.features[i].properties.avspeed +'</b><br>Trip Id: <b>' + trips.features[i].properties.tripid +'</b>');
-			 
+
+
+			var m=L.marker([sx,sy],{icon: picon}).bindPopup( 'Maximum Average Speed: <b>' + trips.features[i].properties.avspeed +'</b><br>Taxi Id: <b>'+trips.features[i].properties.taxiid+'</b><br>Trip Id: <b>' + trips.features[i].properties.tripid +'</b><br>Start Time: <b>'+
+			trips.features[i].properties.starttime+'</b>');
 			 map.addLayer(m);
 			 theMarker.push(m);
-			latlongs.push(m.getLatLng());	
-		  
-		}	
+			 latlongs.push(m.getLatLng());
+			 var m=L.marker([ex,ey],{icon: dicon}).bindPopup( 'Maximum Average Speed: <b>' + trips.features[i].properties.avspeed +'</b><br>Taxi Id: <b>'+trips.features[i].properties.taxiid+'</b><br>Trip Id: <b>' + trips.features[i].properties.tripid +'</b><br>End Time: <b>'+
+			trips.features[i].properties.endtime+'</b>');
+
+			 map.addLayer(m);
+			 theMarker.push(m);
+
+			var coord=[];
+			var points=[];
+			coord=trips.features[i].geometry.coordinates;
+			for(var k=0;k<coord.length;k++){
+			points.push( new L.LatLng((coord[k])[1],(coord[k])[0]));
+			}
+			var line=L.polyline(points, { opacity:0 });
+			map.addLayer(line);
+			var animatedMarker = L.animatedMarker(line.getLatLngs(),{icon:icon});
+			map.addLayer(animatedMarker);
+			theMarker.push(animatedMarker);
+
+
+			latlongs.push(m.getLatLng());
+
+		}
 	}
 	hideLayers();
 	var markerBounds = L.latLngBounds(latlongs);
-		map.fitBounds(markerBounds);		
+		map.fitBounds(markerBounds);
 }
 
 function hideLayers (){
@@ -382,12 +411,12 @@ function showMostFrequent(){
 		for(var i=0;i<theMarker.length;i++){
 			 map.removeLayer(theMarker[i]);
 		}
-		
+
 	}
 	this.layer.eachLayer(function(layer){
       map.removeLayer(layer);
 	});
-	
+
 		var fLength= trips.features.length;
 		var coordinatesPickUp=[];
 		var coordinatesDropOff=[];
@@ -401,7 +430,7 @@ function showMostFrequent(){
 		var streetPick;
 		var streetDrop
 		for(var i=0;i<mostFreqPickUp.length;i++){
-			
+
 			for(var k=0;k<fLength;k++){
 				if( trips.features[k].geometry.coordinates[0]== mostFreqPickUp[i] ){
 					streetPick=trips.features[i].properties.streetnames[0];
@@ -411,7 +440,7 @@ function showMostFrequent(){
 			}
 			var x= (mostFreqPickUp[i])[1];
 			var y= (mostFreqPickUp[i])[0];
-			
+
 			var m= L.marker([x,y],{icon: picon}).bindPopup('Most Frquent Pick Up at: ' + x +','+y+'<br>Street Name: '+streetPick).addTo(map);
 			latlong.push(m.getLatLng());
 			theMarker.push(m);
@@ -421,7 +450,7 @@ function showMostFrequent(){
 
 		var mostFreqDropOff= mostFreqStr(coordinatesDropOff);
 		for(var i=0;i<mostFreqDropOff.length;i++){
-			
+
 			for(var k=0;k<fLength;k++){
 				var last= (trips.features[k].geometry.coordinates).length -1;
 				if( trips.features[k].geometry.coordinates[last]== mostFreqDropOff[i] ){
@@ -436,11 +465,11 @@ function showMostFrequent(){
 			latlong.push(m.getLatLng());
 			theMarker.push(m);
 		}
-		
+
 		//var latLngs = [ m.getLatLng() ];
 		var markerBounds = L.latLngBounds(latlong);
 		map.fitBounds(markerBounds);
-		
+
 }
 
 function mostFreqStr(arr) {
@@ -475,13 +504,13 @@ map.on('click', function () {
 		for(var i=0;i<theMarker.length;i++){
 			 map.removeLayer(theMarker[i]);
 		}
-		
+
 	}
-	
+
  for(var i=0;i<markerlist.length;i++ ){
    map.removeLayer(markerlist[i]);
  }
- 
+
  document.getElementById('chkYes').checked = false;
- 
+
 });
