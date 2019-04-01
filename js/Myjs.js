@@ -9,6 +9,7 @@ var dropoffpoint=[]
 var marker1;
 var marker2;
 var markerlist=[];
+var showPath= true;
 var taxi_id_map = new Map();
 var picon = L.icon({
     iconUrl: '\js\\images\\greenMarker.png',
@@ -77,6 +78,8 @@ this.layer=L.geoJson(trips,
 
 function onEachFeature(features, layer) {
   //bind click
+  console.log('on eachh'+showPath);
+  if(showPath){
   layer.on('click', function(e){
 
 	if(theMarker.length>0){
@@ -116,11 +119,11 @@ function onEachFeature(features, layer) {
 		theMarker.push(marker2);
 		theMarker.push(animatedMarker);
           markerlist.push(animatedMarker);
-        console.log(e.latlng);
+        
       }
     }
     hideLayers();
-    console.log(features.properties.taxiid);
+    
 
   });
   map.on('click', function (e) {
@@ -129,6 +132,8 @@ function onEachFeature(features, layer) {
     showLayers();
 
   });
+  
+  }
 }
 
 // Initialise the FeatureGroup to store editable layers
@@ -227,8 +232,11 @@ function DrawRS(trips) {
 
 
 function showMaxDuration(){
-
-
+	document.getElementById("lowrange").value = 0;
+	document.getElementById("highrange").value = 100;
+	document.getElementById("highrange").parentNode.dataset.ubound=100;
+	document.getElementById("highrange").parentNode.dataset.lbound=0;
+	showPath=false;
 	if(theMarker.length>0){
 		for(var i=0;i<theMarker.length;i++){
 			 map.removeLayer(theMarker[i]);
@@ -319,7 +327,11 @@ function tripsStyle(features){
 
 
 function showAverageSpeed(){
-
+	document.getElementById("lowrange").value = 0;
+	document.getElementById("highrange").value = 100;
+	document.getElementById("highrange").parentNode.dataset.ubound=100;
+	document.getElementById("highrange").parentNode.dataset.lbound=0;
+	showPath=false;
 	showLayers();
 
 	if(theMarker.length>0){
@@ -406,7 +418,11 @@ function showLayers (){
 
 
 function showMostFrequent(){
-
+	document.getElementById("lowrange").value = 0;
+	document.getElementById("highrange").value = 100;
+	document.getElementById("highrange").parentNode.dataset.ubound=100;
+	document.getElementById("highrange").parentNode.dataset.lbound=0;
+	showPath=false;
 	if(theMarker.length>0){
 		for(var i=0;i<theMarker.length;i++){
 			 map.removeLayer(theMarker[i]);
@@ -499,6 +515,31 @@ function mostFreqStr(arr) {
   return which;
 }
 
+function updateSpeed(){
+	 
+	showPath=false;
+	console.log('rangeee speed'+showPath);
+	var minSpeed=document.getElementById('lowrange').value;
+	var maxSpeed=document.getElementById('highrange').value;
+	
+	if(theMarker.length>0){
+		for(var i=0;i<theMarker.length;i++){
+			 map.removeLayer(theMarker[i]);
+		}
+		
+	}
+	showLayers();
+	document.getElementById('chkYes').checked = false;
+	for(i=0;i<trips.features.length;i++){
+      if(trips.features[i].properties.avspeed >= minSpeed && trips.features[i].properties.avspeed<= maxSpeed){
+        trips.features[i].properties.highlight =true;
+		
+	  }
+	}
+	hideLayers();
+	
+}
+
 map.on('click', function () {
 	if(theMarker.length>0){
 		for(var i=0;i<theMarker.length;i++){
@@ -506,10 +547,7 @@ map.on('click', function () {
 		}
 
 	}
-
- for(var i=0;i<markerlist.length;i++ ){
-   map.removeLayer(markerlist[i]);
- }
+ 
 
  document.getElementById('chkYes').checked = false;
 
