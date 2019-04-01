@@ -3,6 +3,27 @@
 var lat = 41.141376;
 var lng = -8.613999;
 var zoom = 14;
+ var theMarker=[];
+ var startpoint=[]
+var dropoffpoint=[]
+var marker1;
+var marker2;
+var markerlist=[];
+var taxi_id_map = new Map();
+var picon = L.icon({
+    iconUrl: '\js\\images\\greenMarker.png',
+    iconSize:     [40, 40], // size of the icon
+    
+	});
+	
+	var dicon = L.icon({
+		iconUrl: '\js\\images\\redMarker.png',
+		iconSize:     [40, 40], // size of the icon
+		
+	});
+for(i=0;i<trips.features.length;i++){
+ taxi_id_map.set(trips.features[i].properties.taxiid,'#'+Math.floor(Math.random()*16777215).toString(16));
+}
 
 // add an OpenStreetMap tile layer
 var mbAttr = 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
@@ -34,16 +55,81 @@ var map = L.map('map', {
     }
 });
 
+
+
+
 var baseLayers = {
     "Grayscale": grayscale, // Grayscale tile layer
     "Streets": streets, // Streets tile layer
 };
 
+
+
 layerControl = L.control.layers(baseLayers, null, {
     position: 'bottomleft'
 }).addTo(map);
 
-L.geoJson(trips).addTo(map);
+this.layer=L.geoJson(trips,
+  {style : tripsStyle,
+    onEachFeature: onEachFeature
+  }
+).addTo(map);
+
+function onEachFeature(features, layer) {
+  //bind click
+  layer.on('click', function(e){
+
+	if(theMarker.length>0){
+		for(var i=0;i<theMarker.length;i++){
+			 map.removeLayer(theMarker[i]);
+		}
+		
+	}
+    for(i=0;i<trips.features.length;i++){
+      if(features.properties.taxiid == trips.features[i].properties.taxiid){
+        trips.features[i].properties.highlight =true;
+
+        startpoint = trips.features[i].geometry.coordinates[0];
+        dropoffpoint = (trips.features[i].geometry.coordinates[trips.features[i].geometry.coordinates.length-1]);
+
+        marker1 =L.marker([startpoint[1], startpoint[0]],{icon: picon}).bindPopup( 'Maximum Average Speed: <b>' + trips.features[i].properties.avspeed +'</b><br>Trip Id: <b>' + trips.features[i].properties.tripid +'</b>'
+        +'</b><br>Taxi Id: <b>' + trips.features[i].properties.taxiid +'</b><br>Duration: <b>' +'</b>'+ trips.features[i].properties.duration +'</b>').addTo(map);
+        marker2 = L.marker([dropoffpoint[1], dropoffpoint[0]],{icon: dicon}).bindPopup( 'Maximum Average Speed: <b>' + trips.features[i].properties.avspeed +'</b><br>Trip Id: <b>' + trips.features[i].properties.tripid +'</b>'
+        +'</b><br>Taxi Id: <b>' + trips.features[i].properties.taxiid +'</b><br>Duration: <b>' +'</b>'+ trips.features[i].properties.duration +'</b>').addTo(map);
+        //markers();
+        ////////////////////priyanka//////////////////////
+        var coord=[];
+
+        var points=[];
+        coord=trips.features[i].geometry.coordinates;
+        for(var k=0;k<coord.length;k++){
+          points.push( new L.LatLng((coord[k])[1],(coord[k])[0]));
+        }
+        var line=L.polyline(points,{ opacity:0 });
+        map.addLayer(line);
+        var animatedMarker = L.animatedMarker(line.getLatLngs());
+				map.addLayer(animatedMarker);
+        /////////////////////////////////////////////////
+        markerlist.push(marker1);
+        markerlist.push(marker2);
+		theMarker.push(marker1);
+		theMarker.push(marker2);
+		theMarker.push(animatedMarker);
+          markerlist.push(animatedMarker);
+        console.log(e.latlng);
+      }
+    }
+    hideLayers();
+    console.log(features.properties.taxiid);
+
+  });
+  map.on('click', function (e) {
+    //having trouble with resetStyle, so just change it back
+    style : tripsStyle
+    showLayers();
+
+  });
+}
 
 // Initialise the FeatureGroup to store editable layers
 var drawnItems = new L.FeatureGroup();
@@ -56,14 +142,15 @@ var drawControl = new L.Control.Draw({
 	collapsed: false,
     draw: {
         // Available Shapes in Draw box. To disable anyone of them just convert true to false
-        polyline: true,
-        polygon: true,
-        circle: true,
+        polyline: false,
+        polygon: false,
+        circle: false,
         rectangle: true,
-        marker: true,
+        marker: false,
     }
-
+   
 });
+
 map.addControl(drawControl); // To add anything to map, add it to "drawControl"
 //*******************************************************************************************************************************************************
 //*****************************************************************************************************************************************
@@ -103,11 +190,13 @@ map.on('draw:created', function (e) {
 		layer = e.layer;
 	
 	if (type === 'rectangle') {
-		console.log(layer.getLatLngs()); //Rectangle Corners points
+		//console.log(layer.getLatLngs()); //Rectangle Corners points
 		var bounds=layer.getBounds();
 		rt.data([[bounds.getSouthWest().lng,bounds.getSouthWest().lat],[bounds.getNorthEast().lng,bounds.getNorthEast().lat]]).
 		then(function(d){var result = d.map(function(a) {return a.properties;});
-		console.log(result);		// Trip Info: avspeed, distance, duration, endtime, maxspeed, minspeed, starttime, streetnames, taxiid, tripid
+		//console.log(result);		// Trip Info: avspeed, distance, duration, endtime, maxspeed, minspeed, starttime, streetnames, taxiid, tripid
+		map.fitBounds(layer.getBounds());
+		
 		DrawRS(result);
 		});
 	}
@@ -117,8 +206,7 @@ map.on('draw:created', function (e) {
 //*****************************************************************************************************************************************
 // DrawRS Function:
 // Input is a list of road segments ID and their color. Then the visualization can show the corresponding road segments with the color
-// Test:      var input_data = [{road:53, color:"#f00"}, {road:248, color:"#0f0"}, {road:1281, color:"#00f"}];
-//            DrawRS(input_data);
+// Test:    var input_data = [{road:53, color:"#f00"}, {road:248, color:"#0f0"}, {road:1281, color:"#00f"}]; DrawRS(input_data);
 //*****************************************************************************************************************************************
 function DrawRS(trips) {
 	for (var j=0; j<trips.length; j++) {  // Check Number of Segments and go through all segments
@@ -138,4 +226,262 @@ function DrawRS(trips) {
 }
 
 
+function showMaxDuration(){
+	
 
+	if(theMarker.length>0){
+		for(var i=0;i<theMarker.length;i++){
+			 map.removeLayer(theMarker[i]);
+		}
+		
+	}
+	showLayers();
+	var icon = L.icon({
+    iconUrl: '\js\\images\\taxi.gif',
+    iconSize:     [20, 20], // size of the icon
+    
+	});
+	var duration=[];
+	
+   
+	var len= trips.features.length;
+	for(var i=0;i<len;i++){
+		duration[i]= trips.features[i].properties.duration;
+	}
+	var topDurationValues = duration.sort((a,b) => b-a).slice(0,5);
+	
+	var latlongs=[];
+	
+	for(var i=0;i<len;i++){
+		if(topDurationValues.indexOf(trips.features[i].properties.duration) !=-1){
+			var sx= (trips.features[i].geometry.coordinates[0])[1];
+			var sy= (trips.features[i].geometry.coordinates[0])[0];
+			
+			var l= (trips.features[i].geometry.coordinates).length -1;
+			var ex= (trips.features[i].geometry.coordinates[l])[1];
+			var ey= (trips.features[i].geometry.coordinates[l])[0];
+			
+			
+			trips.features[i].properties.highlight =true;
+		
+			 var m=L.marker([sx,sy],{icon: picon}).bindPopup( 'Maximum Duration: <b>' + trips.features[i].properties.duration +'</b><br>Street Name: <b>' + trips.features[i].properties.streetnames[0] +'</b><br>Trip Id: <b>'+trips.features[i].properties.tripid+'</b>');
+			theMarker.push(m);
+			map.addLayer(m);
+			
+			 var m=L.marker([ex,ey],{icon: dicon}).bindPopup( 'Maximum Duration: <b>' + trips.features[i].properties.duration +'</b><br>Street Name: <b>' + trips.features[i].properties.streetnames[l] +'</b><br>Trip Id: <b>'+  trips.features[i].properties.tripid+'</b>');
+			
+			
+			theMarker.push(m);
+			map.addLayer(m);
+			
+					var coord=[];							
+					var points=[];
+					coord=trips.features[i].geometry.coordinates;
+					for(var k=0;k<coord.length;k++){					
+					points.push( new L.LatLng((coord[k])[1],(coord[k])[0]));					
+					}
+					var line=L.polyline(points, { opacity:0 });
+					map.addLayer(line);
+					var animatedMarker = L.animatedMarker(line.getLatLngs(),{icon:icon});
+					map.addLayer(animatedMarker);
+					theMarker.push(animatedMarker);
+			
+			
+			
+			latlongs.push(m.getLatLng());
+			 
+		  
+		}
+	}
+	hideLayers();
+	var markerBounds = L.latLngBounds(latlongs);
+	map.fitBounds(markerBounds);
+}
+	
+	
+
+function getTripColor(taxiid){
+
+ if(taxi_id_map.has(taxiid)){
+   return taxi_id_map.get(taxiid)
+ }
+
+}
+function tripsStyle(features){
+ return {
+   weight : 5,
+   opacity : 3,
+   color : getTripColor(features.properties.taxiid),
+   dashArray : 5,
+   fillOpacity : 0.7
+ }
+}
+
+
+function showAverageSpeed(){
+	
+	showLayers();
+	
+	if(theMarker.length>0){
+		for(var i=0;i<theMarker.length;i++){
+			 map.removeLayer(theMarker[i]);
+		}
+		
+	}
+	var icon = L.icon({
+    iconUrl: '\js\\images\\taxii.gif',
+    iconSize:     [40, 40], // size of the icon
+    
+	});
+	
+	var averageSpeed=[];
+	var len= trips.features.length;
+	for(var i=0;i<len;i++){
+		averageSpeed[i]= trips.features[i].properties.avspeed;
+	}
+	var topaverageSpeed = averageSpeed.sort((a,b) => b-a).slice(0,5);
+	var latlongs=[];
+
+	for(var i=0;i<len;i++){
+		if(topaverageSpeed.indexOf(trips.features[i].properties.avspeed) !=-1){
+			var x= (trips.features[i].geometry.coordinates[0])[1];
+			var y= (trips.features[i].geometry.coordinates[0])[0];
+			trips.features[i].properties.highlight =true;
+			var m=L.marker([x,y],{icon: icon}).bindPopup( 'Maximum Average Speed: <b>' + trips.features[i].properties.avspeed +'</b><br>Trip Id: <b>' + trips.features[i].properties.tripid +'</b>');
+			 
+			 map.addLayer(m);
+			 theMarker.push(m);
+			latlongs.push(m.getLatLng());	
+		  
+		}	
+	}
+	hideLayers();
+	var markerBounds = L.latLngBounds(latlongs);
+		map.fitBounds(markerBounds);		
+}
+
+function hideLayers (){
+  this.layer.eachLayer(function(layer){
+    if(!layer.feature.properties.highlight){
+      map.removeLayer(layer);
+    }
+  });
+}
+
+function showLayers (){
+  this.layer.eachLayer(function(layer){
+    layer.feature.properties.highlight = false;
+    map.addLayer(layer);
+  });
+}
+
+
+function showMostFrequent(){
+
+	if(theMarker.length>0){
+		for(var i=0;i<theMarker.length;i++){
+			 map.removeLayer(theMarker[i]);
+		}
+		
+	}
+	this.layer.eachLayer(function(layer){
+      map.removeLayer(layer);
+	});
+	
+		var fLength= trips.features.length;
+		var coordinatesPickUp=[];
+		var coordinatesDropOff=[];
+		var latlong=[];
+		for(var i=0;i<fLength;i++){
+				var clen= (trips.features[i].geometry.coordinates).length;;
+				coordinatesPickUp[i]= trips.features[i].geometry.coordinates[0];
+				coordinatesDropOff[i]= trips.features[i].geometry.coordinates[clen-1];
+			}
+		var mostFreqPickUp= mostFreqStr(coordinatesPickUp);
+		var streetPick;
+		var streetDrop
+		for(var i=0;i<mostFreqPickUp.length;i++){
+			
+			for(var k=0;k<fLength;k++){
+				if( trips.features[k].geometry.coordinates[0]== mostFreqPickUp[i] ){
+					streetPick=trips.features[i].properties.streetnames[0];
+					break;
+				}
+
+			}
+			var x= (mostFreqPickUp[i])[1];
+			var y= (mostFreqPickUp[i])[0];
+			
+			var m= L.marker([x,y],{icon: picon}).bindPopup('Most Frquent Pick Up at: ' + x +','+y+'<br>Street Name: '+streetPick).addTo(map);
+			latlong.push(m.getLatLng());
+			theMarker.push(m);
+			//map.addLayer(theMarker);
+		}
+
+
+		var mostFreqDropOff= mostFreqStr(coordinatesDropOff);
+		for(var i=0;i<mostFreqDropOff.length;i++){
+			
+			for(var k=0;k<fLength;k++){
+				var last= (trips.features[k].geometry.coordinates).length -1;
+				if( trips.features[k].geometry.coordinates[last]== mostFreqDropOff[i] ){
+					streetDrop=trips.features[k].properties.streetnames[last];
+					break;
+				}
+
+			}
+			var x= (mostFreqDropOff[i])[1];
+			var y= (mostFreqDropOff[i])[0];
+			var m= L.marker([x,y],{icon: dicon}).bindPopup('Most Frquent Drop Off at: ' + x +','+y+'<br>Street Name: '+streetDrop).addTo(map);
+			latlong.push(m.getLatLng());
+			theMarker.push(m);
+		}
+		
+		//var latLngs = [ m.getLatLng() ];
+		var markerBounds = L.latLngBounds(latlong);
+		map.fitBounds(markerBounds);
+		
+}
+
+function mostFreqStr(arr) {
+  var obj = {}, mostFreq = 0, which = [];
+
+  arr.forEach(ea => {
+    if (!obj[ea]) {
+      obj[ea] = 1;
+    } else {
+      obj[ea]++;
+    }
+
+    if (obj[ea] > mostFreq) {
+      mostFreq = obj[ea];
+      which = [ea];
+    } else if (obj[ea] === mostFreq) {
+      which.push(ea);
+    }
+  });
+  /*
+  if (which.length > 1) {
+    which = `"${which.join(`" and "`)}" are most frequent`
+  } else {
+    which = `"${which}" is the most frequent`
+  }
+*/
+  return which;
+}
+
+map.on('click', function () {
+	if(theMarker.length>0){
+		for(var i=0;i<theMarker.length;i++){
+			 map.removeLayer(theMarker[i]);
+		}
+		
+	}
+	
+ for(var i=0;i<markerlist.length;i++ ){
+   map.removeLayer(markerlist[i]);
+ }
+ 
+ document.getElementById('chkYes').checked = false;
+ 
+});

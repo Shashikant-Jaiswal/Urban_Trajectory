@@ -7,16 +7,17 @@ html {
 }
 
 #map {
-	width: 70%;
+	width: 80%;
 	height: 100%;
 	float: left;
 	z-index: 1;
 }
 
 #rightside {
-	width: 30%;
+	width: 20%;
 	height: 100%;
 	position: fixed; 
 	background-color: snow;
-	left: 70%;
+	left: 80%;
+	padding-left:2%
 }

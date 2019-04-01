@@ -16,6 +16,7 @@
 	<!-- Leaflet Map api -->
 	<script src="js/leaflet-src.js"></script>
 	<script src="js/Leaflet.draw.js"></script>
+
 	<script src="js/edit/handler/Edit.Poly.js"></script>
 	<script src="js/edit/handler/Edit.SimpleShape.js"></script>
 	<script src="js/edit/handler/Edit.Circle.js"></script>
@@ -46,6 +47,7 @@
 	<script src="js/communist.js"></script>
 	<script src="js/TArr.js"></script>
 
+
   </head>
   <body>
     <!-- Navigation -->
@@ -61,14 +63,29 @@
     </nav>
 	 <div id="map"></div>
 	 <div id="rightside">
-		<img src="test.jpg" style="margin:auto; width:100%;display:block" />
+		<label >
+			<input type="radio" id="chkYes" name="oneGroup" onclick="showMaxDuration()" />
+			 Top 5 Max Duration
+		</label>
+		<label >
+			<input type="radio" id="chkYes" name="oneGroup" onclick="showAverageSpeed()" />
+			 Top 5 Max Average Speed
+		</label>
+		<label >
+			<input type="radio" id="chkYes" name="oneGroup" onclick="showMostFrequent()" />
+			 Most  Frequent Pick Up and Drop Off
+		</label>
 	 </div>
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="js/bootstrap.min.js"></script>
 	<!-- Your js File -->
-	<script src="js/trips.geojson"></script>
+	
+  <script src = "js/trips.geojson"></script>
+   <script src="js/AnimatedMarker.js"></script>
     <script src="js/Myjs.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-ajax/2.1.0/leaflet.ajax.js"></script>
   </body>
 </html>
