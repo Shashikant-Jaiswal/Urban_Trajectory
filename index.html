@@ -65,7 +65,7 @@
 	 <div id="rightside">
 	   <img id="lengend1" src="js/images/greenMarker.png"/> Start Point<br>
 	    <img id="lengend1" src="js/images/redMarker.png"/> End Point<br>
-
+<br>
 		<label >
 			<input type="radio" id="chkYes" name="oneGroup" onclick="showMaxDuration()" />
 			 Top 5 Max Duration
@@ -78,9 +78,32 @@
 			<input type="radio" id="chkYes" name="oneGroup" onclick="showMostFrequent()" />
 			 Most  Frequent Pick Up and Drop Off
 		</label>
-    <button id="streetButton" onclick ="showStreets()">Show trajectories with 'Praca da Batalha'</button>
-        
-    </div>
+
+			<label>
+		<br>
+		Select Average Speed Range:<br>(0-100)
+		<div class='multi-range' data-lbound='0' data-ubound='100'>
+		<input type='range' id="lowrange"
+			   min='0' max='90' step='10' value='0'
+			   oninput='this.parentNode.dataset.lbound=this.value;' onchange="updateSpeed()"
+		/>
+		<input type='range' id="highrange"
+			   min='10' max='100' step='10' value='100'
+			   oninput='this.parentNode.dataset.ubound=this.value;' onchange="updateSpeed()"
+		/>
+		</div>
+		</label>
+		<br><br><br>
+		
+	<label>
+	Choose By Street:<br>
+	 <select id="streets" onchange="showStreets()">
+			<option value="">Select Street</option>
+			
+	 </select>
+	 </label>
+
+
 
 	 </div>
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->

@@ -9,7 +9,13 @@ var dropoffpoint=[]
 var marker1;
 var marker2;
 var markerlist=[];
+var showPath= true;
 var taxi_id_map = new Map();
+var distinct_street_names = [];
+var streetNames;
+
+console.log("streetnames" + streetNames);
+
 var picon = L.icon({
     iconUrl: '\js\\images\\greenMarker.png',
     iconSize:     [40, 40], // size of the icon
@@ -25,10 +31,12 @@ for(i=0;i<trips.features.length;i++){
  taxi_id_map.set(trips.features[i].properties.taxiid,'#'+Math.floor(Math.random()*16777215).toString(16));
 }
 
+
+
 // add an OpenStreetMap tile layer
 var mbAttr = 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
     '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
-    'Imagery © <a href="http://mapbox.com">Mapbox</a>',
+    'Imagery Â© <a href="http://mapbox.com">Mapbox</a>',
     mbUrl = 'https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoicGxhbmVtYWQiLCJhIjoiemdYSVVLRSJ9.g3lbg_eN0kztmsfIPxa9MQ';
 
 
@@ -75,9 +83,18 @@ this.layer=L.geoJson(trips,
   }
 ).addTo(map);
 
+
+//*********************************************************************************************************
+//**************************** onEachFeature function for Defalut layer ***********************************
+//*********************************************************************************************************
+
 function onEachFeature(features, layer) {
   //bind click
+
   layer.on('click', function(e){
+
+    console.log('on eachh'+showPath);
+    if(showPath){
 
 	if(theMarker.length>0){
 		for(var i=0;i<theMarker.length;i++){
@@ -92,9 +109,9 @@ function onEachFeature(features, layer) {
         startpoint = trips.features[i].geometry.coordinates[0];
         dropoffpoint = (trips.features[i].geometry.coordinates[trips.features[i].geometry.coordinates.length-1]);
 
-        marker1 =L.marker([startpoint[1], startpoint[0]],{icon: picon}).bindPopup( 'Maximum Average Speed: <b>' + trips.features[i].properties.avspeed +'</b><br>Trip Id: <b>' + trips.features[i].properties.tripid +'</b>'
+        marker1 =L.marker([startpoint[1], startpoint[0]],{icon: picon}).bindPopup( 'Average Speed: <b>' + trips.features[i].properties.avspeed +'</b><br>Trip Id: <b>' + trips.features[i].properties.tripid +'</b>'
         +'</b><br>Taxi Id: <b>' + trips.features[i].properties.taxiid +'</b><br>Duration: <b>' +'</b>'+ trips.features[i].properties.duration +'</b>').addTo(map);
-        marker2 = L.marker([dropoffpoint[1], dropoffpoint[0]],{icon: dicon}).bindPopup( 'Maximum Average Speed: <b>' + trips.features[i].properties.avspeed +'</b><br>Trip Id: <b>' + trips.features[i].properties.tripid +'</b>'
+        marker2 = L.marker([dropoffpoint[1], dropoffpoint[0]],{icon: dicon}).bindPopup( 'Average Speed: <b>' + trips.features[i].properties.avspeed +'</b><br>Trip Id: <b>' + trips.features[i].properties.tripid +'</b>'
         +'</b><br>Taxi Id: <b>' + trips.features[i].properties.taxiid +'</b><br>Duration: <b>' +'</b>'+ trips.features[i].properties.duration +'</b>').addTo(map);
         //markers();
         ////////////////////priyanka//////////////////////
@@ -116,12 +133,12 @@ function onEachFeature(features, layer) {
 		theMarker.push(marker2);
 		theMarker.push(animatedMarker);
           markerlist.push(animatedMarker);
-        console.log(e.latlng);
+
       }
     }
     hideLayers();
-    console.log(features.properties.taxiid);
 
+    }
   });
   map.on('click', function (e) {
     //having trouble with resetStyle, so just change it back
@@ -129,9 +146,12 @@ function onEachFeature(features, layer) {
     showLayers();
 
   });
-}
 
+  }
+
+//*********************************************************************************************************
 // Initialise the FeatureGroup to store editable layers
+//*********************************************************************************************************
 var drawnItems = new L.FeatureGroup();
 map.addLayer(drawnItems);
 
@@ -225,10 +245,23 @@ function DrawRS(trips) {
 	}
 }
 
+//*********************************************************************************************************
+//**************************** Show Max Duration Functionality ********************************************
+//*********************************************************************************************************
 
 function showMaxDuration(){
+	document.getElementById("lowrange").value = 0;
+	document.getElementById("highrange").value = 100;
+	document.getElementById("highrange").parentNode.dataset.ubound=100;
+	document.getElementById("highrange").parentNode.dataset.lbound=0;
+  document.getElementById("streets").value = 'Select Street';
 
+  if (streetNames != undefined)
+  {
+  map.removeLayer(streetNames)
+  }
 
+	showPath=false;
 	if(theMarker.length>0){
 		for(var i=0;i<theMarker.length;i++){
 			 map.removeLayer(theMarker[i]);
@@ -236,6 +269,7 @@ function showMaxDuration(){
 
 	}
 	showLayers();
+
 	var icon = L.icon({
     iconUrl: '\js\\images\\taxi.gif',
     iconSize:     [20, 20], // size of the icon
@@ -307,6 +341,7 @@ function getTripColor(taxiid){
  }
 
 }
+
 function tripsStyle(features){
  return {
    weight : 5,
@@ -318,9 +353,23 @@ function tripsStyle(features){
 }
 
 
-function showAverageSpeed(){
+//*********************************************************************************************************
+//**************************** Show Average Speed Functionality ******************************************
+//*********************************************************************************************************
 
+function showAverageSpeed(){
+	document.getElementById("lowrange").value = 0;
+	document.getElementById("highrange").value = 100;
+	document.getElementById("highrange").parentNode.dataset.ubound=100;
+	document.getElementById("highrange").parentNode.dataset.lbound=0;
+  document.getElementById("streets").value = 'Select Street';
+	showPath=false;
 	showLayers();
+
+  if (streetNames != undefined)
+  {
+    map.removeLayer(streetNames)
+  }
 
 	if(theMarker.length>0){
 		for(var i=0;i<theMarker.length;i++){
@@ -356,12 +405,12 @@ function showAverageSpeed(){
 			trips.features[i].properties.highlight =true;
 
 
-			var m=L.marker([sx,sy],{icon: picon}).bindPopup( 'Maximum Average Speed: <b>' + trips.features[i].properties.avspeed +'</b><br>Taxi Id: <b>'+trips.features[i].properties.taxiid+'</b><br>Trip Id: <b>' + trips.features[i].properties.tripid +'</b><br>Start Time: <b>'+
+			var m=L.marker([sx,sy],{icon: picon}).bindPopup( 'Average Speed: <b>' + trips.features[i].properties.avspeed +'</b><br>Taxi Id: <b>'+trips.features[i].properties.taxiid+'</b><br>Trip Id: <b>' + trips.features[i].properties.tripid +'</b><br>Start Time: <b>'+
 			trips.features[i].properties.starttime+'</b>');
 			 map.addLayer(m);
 			 theMarker.push(m);
 			 latlongs.push(m.getLatLng());
-			 var m=L.marker([ex,ey],{icon: dicon}).bindPopup( 'Maximum Average Speed: <b>' + trips.features[i].properties.avspeed +'</b><br>Taxi Id: <b>'+trips.features[i].properties.taxiid+'</b><br>Trip Id: <b>' + trips.features[i].properties.tripid +'</b><br>End Time: <b>'+
+			 var m=L.marker([ex,ey],{icon: dicon}).bindPopup( '1Average Speed: <b>' + trips.features[i].properties.avspeed +'</b><br>Taxi Id: <b>'+trips.features[i].properties.taxiid+'</b><br>Trip Id: <b>' + trips.features[i].properties.tripid +'</b><br>End Time: <b>'+
 			trips.features[i].properties.endtime+'</b>');
 
 			 map.addLayer(m);
@@ -389,6 +438,10 @@ function showAverageSpeed(){
 		map.fitBounds(markerBounds);
 }
 
+//*********************************************************************************************************
+//**************************** Showing and Hiding Defalut layout Functionality ****************************
+//*********************************************************************************************************
+
 function hideLayers (){
   this.layer.eachLayer(function(layer){
     if(!layer.feature.properties.highlight){
@@ -405,8 +458,17 @@ function showLayers (){
 }
 
 
-function showMostFrequent(){
+//*********************************************************************************************************
+//**************************** Show Most Frequent Pick-up and Drop off Functionality **********************
+//*********************************************************************************************************
 
+function showMostFrequent(){
+	document.getElementById("lowrange").value = 0;
+	document.getElementById("highrange").value = 100;
+	document.getElementById("highrange").parentNode.dataset.ubound=100;
+	document.getElementById("highrange").parentNode.dataset.lbound=0;
+  document.getElementById("streets").value = 'Select Street';
+	showPath=false;
 	if(theMarker.length>0){
 		for(var i=0;i<theMarker.length;i++){
 			 map.removeLayer(theMarker[i]);
@@ -416,6 +478,11 @@ function showMostFrequent(){
 	this.layer.eachLayer(function(layer){
       map.removeLayer(layer);
 	});
+
+  if (streetNames != undefined)
+  {
+    map.removeLayer(streetNames)
+  }
 
 		var fLength= trips.features.length;
 		var coordinatesPickUp=[];
@@ -494,84 +561,48 @@ function mostFreqStr(arr) {
 }
 
 
-map.on('click', function () {
+//*********************************************************************************************************
+//**************************** Choose avg. speed range Functionality **************************************
+//*********************************************************************************************************
+
+function updateSpeed(){
+
+	showPath=false;
+	console.log('rangeee speed'+showPath);
+	var minSpeed=document.getElementById('lowrange').value;
+	var maxSpeed=document.getElementById('highrange').value;
+
 	if(theMarker.length>0){
 		for(var i=0;i<theMarker.length;i++){
 			 map.removeLayer(theMarker[i]);
 		}
+
 	}
 
- for(var i=0;i<markerlist.length;i++ ){
-   map.removeLayer(markerlist[i]);
- }
- document.getElementById('chkYes').checked = false;
-});
+  if (streetNames != undefined)
+  {
+    map.removeLayer(streetNames)
+  }
+
+	showLayers();
+	document.getElementById('chkYes').checked = false;
+	for(i=0;i<trips.features.length;i++){
+      if(trips.features[i].properties.avspeed >= minSpeed && trips.features[i].properties.avspeed<= maxSpeed){
+        trips.features[i].properties.highlight =true;
+
+	  }
+	}
+	hideLayers();
+
+}
 
 
-//Shashi
+//*********************************************************************************************************
+//**************************** Choose by Street Name Functionality ****************************************
+//*********************************************************************************************************
 
-var streets=[];
-var streetNames = L.geoJson(trips, {
-   style : tripsStyle,
-   onEachFeature: function (feature, layer) {
-        streets.push(feature);
-   } ,
-     filter: function (features, layer) {
-     for(var i=0; i<features.properties.streetnames.length; i++){
-       return_value = false;
-       if( features.properties.streetnames[i]== "Praca da Batalha") {
-           //console.log("shashikant displaying - Praca da Batalha")
-           return_value = true;
-           break;
-       }
-   }
-   return return_value;
- }
+// Code to get the distinct street names and making them available in the dropdown menu
 
-});
-
-
-
-
-//document.getElementById("streetButton").addEventListener("click", showStreets);
-
-function showStreets() {
-
-        //Remove Markers if any
-         if(theMarker.length>0){
-           for(var i=0;i<theMarker.length;i++){
-              map.removeLayer(theMarker[i]);
-           }
-         }
-       //Remove if there is any other map layer
-       this.layer.eachLayer(function(layer){
-            map.removeLayer(layer);
-       });
-
-        //Add new geoJSON layer with street Names
-       streetNames.addTo(map);
-
-        var latlongs=[];
-        var geometry_index = streets[0].properties.streetnames.indexOf("Praca da Batalha");
-
-        var x= streets[0].geometry.coordinates[geometry_index][1];
-  			var y= streets[0].geometry.coordinates[geometry_index][0];
-
-        console.log("shashikant x geometry index:"+x);
-        console.log("shashikant y geometry index:"+y);
-
-  			var m= L.marker([x,y],{icon: picon}).bindPopup('Co-ordinates: ' + x +','+y+'<br>Street Name: '+streets[0].properties.streetnames[geometry_index]).addTo(map);
-  			theMarker.push(m);
-        latlongs.push(m.getLatLng());
-        var markerBounds = L.latLngBounds(latlongs);
-        map.fitBounds(markerBounds);
-        showStreetOptions();
-};
-
-
-function showStreetOptions() {
-
-    var distinct_street_names = [];
     distinct_street_names[0] = trips.features[0].properties.streetnames[0];
 
     for(var i=0; i<trips.features.length; i++)
@@ -586,6 +617,98 @@ function showStreetOptions() {
           }
        }
     }
-        console.log(distinct_street_names.length);
+    //console.log(distinct_street_names.length);
 
+document.getElementById('streets').options.length = 0;
+//var street_optoins =['A','B','C'];
+createOption(document.getElementById('streets'), "Select Street", "Select Street");
+
+for (var i = 0; i < distinct_street_names.length; i++) {
+createOption(document.getElementById('streets'), distinct_street_names[i], distinct_street_names[i]);
 }
+function createOption(id, text, value) {
+        var opt = document.createElement('option');
+        opt.value = value;
+        opt.text = text;
+        id.options.add(opt);
+    }
+
+
+
+function showStreets() {
+
+	document.getElementById("lowrange").value = 0;
+	document.getElementById("highrange").value = 100;
+	document.getElementById("highrange").parentNode.dataset.ubound=100;
+	document.getElementById("highrange").parentNode.dataset.lbound=0;
+	showPath=false;
+	var input_street_name = document.getElementById("streets").value;
+  console.log(input_street_name);
+        //Remove Markers if any
+         if(theMarker.length>0){
+           for(var i=0;i<theMarker.length;i++){
+              map.removeLayer(theMarker[i]);
+           }
+         }
+       //Remove if there is any other map layer
+       this.layer.eachLayer(function(layer){
+            map.removeLayer(layer);
+       });
+
+       var streets = [];
+
+       streetNames = L.geoJson(trips, {
+          style : tripsStyle,
+          onEachFeature: function (feature, layer) {
+               streets.push(feature);
+          } ,
+            filter: function (features, layer) {
+            for(var i=0; i<features.properties.streetnames.length; i++){
+              return_value = false;
+              if( features.properties.streetnames[i]== input_street_name) {
+                  //console.log("shashikant displaying - Praca da Batalha")
+                  return_value = true;
+                  break;
+              }
+          }
+          return return_value;
+        }
+
+       });
+
+        //Add new geoJSON layer with street Names
+       streetNames.addTo(map);
+
+        var latlongs=[];
+        var geometry_index = streets[0].properties.streetnames.indexOf(input_street_name);
+
+        var x= streets[0].geometry.coordinates[geometry_index][1];
+  			var y= streets[0].geometry.coordinates[geometry_index][0];
+
+        console.log("shashikant x geometry index:"+x);
+        console.log("shashikant y geometry index:"+y);
+
+  			var m= L.marker([x,y],{icon: picon}).bindPopup('Co-ordinates: ' + x +','+y+'<br>Street Name: '+streets[0].properties.streetnames[geometry_index]
+        +'<br> No. of trips via this street : '+streets.length).addTo(map);
+  			theMarker.push(m);
+        latlongs.push(m.getLatLng());
+        var markerBounds = L.latLngBounds(latlongs);
+        map.fitBounds(markerBounds);
+};
+
+
+//*********************************************************************************************************
+//********************************** Clearing Map - on Click *********************************************
+//*********************************************************************************************************
+
+map.on('click', function () {
+	if(theMarker.length>0){
+		for(var i=0;i<theMarker.length;i++){
+			 map.removeLayer(theMarker[i]);
+		}
+	}
+
+ document.getElementById('chkYes').checked = false;
+
+ showPath = true;
+});
