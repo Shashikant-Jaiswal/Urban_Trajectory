@@ -11,6 +11,7 @@ var marker2;
 var markerlist=[];
 var showPath= true;
 var taxi_id_map = new Map();
+
 var picon = L.icon({
     iconUrl: '\js\\images\\greenMarker.png',
     iconSize:     [40, 40], // size of the icon
@@ -26,6 +27,23 @@ for(i=0;i<trips.features.length;i++){
  taxi_id_map.set(trips.features[i].properties.taxiid,'#'+Math.floor(Math.random()*16777215).toString(16));
 }
 
+
+
+//Adding Dropdown data
+document.getElementById('streets').options.length = 0;
+var streets =['A','B','C'];
+createOption(document.getElementById('streets'), "Select Street", "Select Street");
+for (var i = 0; i < streets.length; i++) {
+createOption(document.getElementById('streets'), streets[i], streets[i]);
+}
+function createOption(id, text, value) {
+        var opt = document.createElement('option');
+        opt.value = value;
+        opt.text = text;
+        id.options.add(opt);
+    }
+	
+///////////////////////////////////
 // add an OpenStreetMap tile layer
 var mbAttr = 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
     '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
@@ -560,6 +578,7 @@ var streetNames = L.geoJson(trips, {
 
 function showStreets() {
 
+	alert('hi');
         //Remove Markers if any
          if(theMarker.length>0){
            for(var i=0;i<theMarker.length;i++){
@@ -575,6 +594,9 @@ function showStreets() {
         //Add new geoJSON layer with street Names
        streetNames.addTo(map);
 };
+
+
+
 
 map.on('click', function () {
 	if(theMarker.length>0){
