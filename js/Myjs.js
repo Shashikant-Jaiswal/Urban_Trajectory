@@ -386,12 +386,12 @@ function showAverageSpeed(){
 			trips.features[i].properties.highlight =true;
 
 
-			var m=L.marker([sx,sy],{icon: picon}).bindPopup( 'Maximum Average Speed: <b>' + trips.features[i].properties.avspeed +'</b><br>Taxi Id: <b>'+trips.features[i].properties.taxiid+'</b><br>Trip Id: <b>' + trips.features[i].properties.tripid +'</b><br>Start Time: <b>'+
+			var m=L.marker([sx,sy],{icon: picon}).bindPopup( 'Average Speed: <b>' + trips.features[i].properties.avspeed +'</b><br>Taxi Id: <b>'+trips.features[i].properties.taxiid+'</b><br>Trip Id: <b>' + trips.features[i].properties.tripid +'</b><br>Start Time: <b>'+
 			trips.features[i].properties.starttime+'</b>');
 			 map.addLayer(m);
 			 theMarker.push(m);
 			 latlongs.push(m.getLatLng());
-			 var m=L.marker([ex,ey],{icon: dicon}).bindPopup( 'Maximum Average Speed: <b>' + trips.features[i].properties.avspeed +'</b><br>Taxi Id: <b>'+trips.features[i].properties.taxiid+'</b><br>Trip Id: <b>' + trips.features[i].properties.tripid +'</b><br>End Time: <b>'+
+			 var m=L.marker([ex,ey],{icon: dicon}).bindPopup( 'Average Speed: <b>' + trips.features[i].properties.avspeed +'</b><br>Taxi Id: <b>'+trips.features[i].properties.taxiid+'</b><br>Trip Id: <b>' + trips.features[i].properties.tripid +'</b><br>End Time: <b>'+
 			trips.features[i].properties.endtime+'</b>');
 
 			 map.addLayer(m);
