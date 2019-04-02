@@ -113,9 +113,9 @@ function onEachFeature(features, layer) {
         startpoint = trips.features[i].geometry.coordinates[0];
         dropoffpoint = (trips.features[i].geometry.coordinates[trips.features[i].geometry.coordinates.length-1]);
 
-        marker1 =L.marker([startpoint[1], startpoint[0]],{icon: picon}).bindPopup( 'Maximum Average Speed: <b>' + trips.features[i].properties.avspeed +'</b><br>Trip Id: <b>' + trips.features[i].properties.tripid +'</b>'
+        marker1 =L.marker([startpoint[1], startpoint[0]],{icon: picon}).bindPopup( 'Average Speed: <b>' + trips.features[i].properties.avspeed +'</b><br>Trip Id: <b>' + trips.features[i].properties.tripid +'</b>'
         +'</b><br>Taxi Id: <b>' + trips.features[i].properties.taxiid +'</b><br>Duration: <b>' +'</b>'+ trips.features[i].properties.duration +'</b>').addTo(map);
-        marker2 = L.marker([dropoffpoint[1], dropoffpoint[0]],{icon: dicon}).bindPopup( 'Maximum Average Speed: <b>' + trips.features[i].properties.avspeed +'</b><br>Trip Id: <b>' + trips.features[i].properties.tripid +'</b>'
+        marker2 = L.marker([dropoffpoint[1], dropoffpoint[0]],{icon: dicon}).bindPopup( 'Average Speed: <b>' + trips.features[i].properties.avspeed +'</b><br>Trip Id: <b>' + trips.features[i].properties.tripid +'</b>'
         +'</b><br>Taxi Id: <b>' + trips.features[i].properties.taxiid +'</b><br>Duration: <b>' +'</b>'+ trips.features[i].properties.duration +'</b>').addTo(map);
         //markers();
         ////////////////////priyanka//////////////////////
@@ -574,7 +574,6 @@ var streetNames = L.geoJson(trips, {
 
 });
 
-//document.getElementById("streetButton").addEventListener("click", showStreets);
 
 function showStreets() {
 
@@ -583,7 +582,7 @@ function showStreets() {
 	document.getElementById("highrange").parentNode.dataset.ubound=100;
 	document.getElementById("highrange").parentNode.dataset.lbound=0;
 	showPath=false;
-	alert('hi');
+	alert(document.getElementById("streets").value);
         //Remove Markers if any
          if(theMarker.length>0){
            for(var i=0;i<theMarker.length;i++){
