@@ -578,6 +578,11 @@ var streetNames = L.geoJson(trips, {
 
 function showStreets() {
 
+	document.getElementById("lowrange").value = 0;
+	document.getElementById("highrange").value = 100;
+	document.getElementById("highrange").parentNode.dataset.ubound=100;
+	document.getElementById("highrange").parentNode.dataset.lbound=0;
+	showPath=false;
 	alert('hi');
         //Remove Markers if any
          if(theMarker.length>0){
@@ -593,6 +598,8 @@ function showStreets() {
 
         //Add new geoJSON layer with street Names
        streetNames.addTo(map);
+	   
+	document.getElementById('chkYes').checked = false;
 };
 
 
