@@ -493,46 +493,6 @@ function mostFreqStr(arr) {
   return which;
 }
 
-var streetNames = L.geoJson(trips, {
-   style : tripsStyle,
-   onEachFeature: function (features, layer) {
-       layer.bindPopup('Shashi taxi id: <b>' + features.properties.taxiid +'</b>');
-   }  ,
-     filter: function (features, layer) {
-
-     for(var i=0; i<features.properties.streetnames.length; i++){
-       return_value = false;
-       if( features.properties.streetnames[i]== "Praca da Batalha") {
-           console.log("shashikant displaying - Praca da Batalha")
-           return_value = true;
-           break;
-       }
-
-   }
-   return return_value;
- }
-
-});
-
-//document.getElementById("streetButton").addEventListener("click", showStreets);
-
-function showStreets() {
-
-        //Remove Markers if any
-         if(theMarker.length>0){
-           for(var i=0;i<theMarker.length;i++){
-              map.removeLayer(theMarker[i]);
-           }
-         }
-
-       //Remove if there is any other map layer
-       this.layer.eachLayer(function(layer){
-            map.removeLayer(layer);
-       });
-
-        //Add new geoJSON layer with street Names
-       streetNames.addTo(map);
-};
 
 map.on('click', function () {
 	if(theMarker.length>0){
@@ -546,3 +506,86 @@ map.on('click', function () {
  }
  document.getElementById('chkYes').checked = false;
 });
+
+
+//Shashi
+
+var streets=[];
+var streetNames = L.geoJson(trips, {
+   style : tripsStyle,
+   onEachFeature: function (feature, layer) {
+        streets.push(feature);
+   } ,
+     filter: function (features, layer) {
+     for(var i=0; i<features.properties.streetnames.length; i++){
+       return_value = false;
+       if( features.properties.streetnames[i]== "Praca da Batalha") {
+           //console.log("shashikant displaying - Praca da Batalha")
+           return_value = true;
+           break;
+       }
+   }
+   return return_value;
+ }
+
+});
+
+
+
+
+//document.getElementById("streetButton").addEventListener("click", showStreets);
+
+function showStreets() {
+
+        //Remove Markers if any
+         if(theMarker.length>0){
+           for(var i=0;i<theMarker.length;i++){
+              map.removeLayer(theMarker[i]);
+           }
+         }
+       //Remove if there is any other map layer
+       this.layer.eachLayer(function(layer){
+            map.removeLayer(layer);
+       });
+
+        //Add new geoJSON layer with street Names
+       streetNames.addTo(map);
+
+        var latlongs=[];
+        var geometry_index = streets[0].properties.streetnames.indexOf("Praca da Batalha");
+
+        var x= streets[0].geometry.coordinates[geometry_index][1];
+  			var y= streets[0].geometry.coordinates[geometry_index][0];
+
+        console.log("shashikant x geometry index:"+x);
+        console.log("shashikant y geometry index:"+y);
+
+  			var m= L.marker([x,y],{icon: picon}).bindPopup('Co-ordinates: ' + x +','+y+'<br>Street Name: '+streets[0].properties.streetnames[geometry_index]).addTo(map);
+  			theMarker.push(m);
+        latlongs.push(m.getLatLng());
+        var markerBounds = L.latLngBounds(latlongs);
+        map.fitBounds(markerBounds);
+        showStreetOptions();
+};
+
+
+function showStreetOptions() {
+
+    var distinct_street_names = [];
+    distinct_street_names[0] = trips.features[0].properties.streetnames[0];
+
+    for(var i=0; i<trips.features.length; i++)
+    {
+       for(var j=0;  j<trips.features[i].properties.streetnames.length;  j++)
+       {
+            var len = distinct_street_names.length;
+            if (distinct_street_names.indexOf(trips.features[i].properties.streetnames[j]) == -1)
+            {
+              distinct_street_names[len] = trips.features[i].properties.streetnames[j];
+              len++;
+          }
+       }
+    }
+        console.log(distinct_street_names.length);
+
+}
